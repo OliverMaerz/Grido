@@ -3,7 +3,6 @@ package com.olivermaerz.grido;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -18,7 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static com.olivermaerz.grido.R.*;
+import static com.olivermaerz.grido.R.string;
 
 /**
  * Created by omaerz on 11/27/15.
@@ -59,7 +58,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<Movies>> {
             this.imageAdapter.setWidth(width);
             for (Movies movie : movieListObj){
                 this.imageAdapter.add(movie.getPosterUrl());
-                Log.v(LOG_TAG, "MoviePoster: " + movie.getPosterUrl());
+                //Log.v(LOG_TAG, "MoviePoster: " + movie.getPosterUrl());
 
             }
             this.listener.onTaskCompleted(movieListObj);
@@ -105,7 +104,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<Movies>> {
 
             URL url = new URL(builder.build().toString());
 
-            Log.v(LOG_TAG, "Built URI" + builder.build().toString());
+            //Log.v(LOG_TAG, "Built URI" + builder.build().toString());
 
             // Create the request to moviedb, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -136,7 +135,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<Movies>> {
             //moviesArray = getMoviesFromJson(moviesJsonString);
             moviesList = getMoviesFromJson(moviesJsonString);
         } catch (IOException | JSONException e) {
-            Log.e(LOG_TAG, "Internet Connection Error when connection to MovieDB ", e);
+            //Log.e(LOG_TAG, "Internet Connection Error when connection to MovieDB ", e);
 
             return null;
         } finally{
@@ -147,7 +146,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<Movies>> {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e("PlaceholderFragment", "Error closing stream", e);
+                    //Log.e("PlaceholderFragment", "Error closing stream", e);
                 }
 
 

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements OnCompleted{
             config = new Config(POPULARITY);
 
             // no instance for movie date found - call movie db
-            Log.v(LOG_TAG, "No saved instance - creating ArrayList and fetching movie data");
+            //Log.v(LOG_TAG, "No saved instance - creating ArrayList and fetching movie data");
             movieListObj = new ArrayList<Movies>();
             FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, imageAdapter, MainActivity.this, this);
             fetchMovies.execute();
@@ -98,13 +97,13 @@ public class MainActivity extends AppCompatActivity implements OnCompleted{
             config = savedInstanceState.getParcelable(STATE_CONFIG);
 
             // data found; get parcelable and display data from saved instance
-            Log.v(LOG_TAG, "Saved instance with name " + STATE_MOVIES + " found.");
+            //Log.v(LOG_TAG, "Saved instance with name " + STATE_MOVIES + " found.");
             movieListObj = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
             this.gridView.setAdapter(imageAdapter);
             imageAdapter.setWidth(this.imageWidth);
             for (Movies movie : movieListObj){
                 imageAdapter.add(movie.getPosterUrl());
-                Log.v(LOG_TAG, "Recovered MoviePoster: " + movie.getPosterUrl());
+                //Log.v(LOG_TAG, "Recovered MoviePoster: " + movie.getPosterUrl());
 
             }
 
