@@ -20,12 +20,12 @@ public class ImageAdapter extends BaseAdapter {
     private int width;
 
     public ImageAdapter(Context c) {
-        context = c;
-        listOfMovies = new ArrayList<>();
+        this.context = c;
+        this.listOfMovies = new ArrayList<>();
     }
 
     public void add(String movie) {
-        listOfMovies.add(movie);
+        this.listOfMovies.add(movie);
         notifyDataSetChanged();
     }
 
@@ -39,8 +39,8 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        if (position >= 0 && position < listOfMovies.size()) {
-            return listOfMovies.get(position);
+        if (position >= 0 && position < this.listOfMovies.size()) {
+            return this.listOfMovies.get(position);
         }
         return null;
     }
@@ -55,18 +55,20 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
-            imageView = new ImageView(context);
+            imageView = new ImageView(this.context);
             int height = (int)(this.width * 1.5);
             imageView.setLayoutParams(new GridView.LayoutParams(this.width, height));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(0, 0, 0, 0);
+
+
         } else {
             imageView = (ImageView) convertView;
         }
 
 
-        Picasso.with(context)
-                .load(listOfMovies.get(position))
+        Picasso.with(this.context)
+                .load(this.listOfMovies.get(position))
                 .placeholder(R.drawable.loading_image)
                 .into(imageView);
         return imageView;

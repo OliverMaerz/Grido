@@ -2,10 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.olivermaerz.grido.MainActivity">
+
+
     <item
         android:id="@+id/change_sort_order"
-        android:orderInCategory="100"
+        android:orderInCategory="50"
         android:title="@string/sort_by_rating"
         app:showAsAction="never" />
-        <!--android:title="@string/sort_by_rating"-->
 </menu>
