@@ -1,7 +1,7 @@
 package com.olivermaerz.grido;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -58,6 +58,7 @@ public class GridFragment extends Fragment implements OnCompleted {
     private OnFragmentInteractionListener mListener;
 
     private Activity myActivity;
+
 
 
     @Override
@@ -153,7 +154,12 @@ public class GridFragment extends Fragment implements OnCompleted {
                     return;
                 }
 
-                mListener.onFragmentInteraction(movieListObj.get(position));
+
+                if (mListener != null) {
+                    mListener.onFragmentInteraction(movieListObj.get(position));
+                }
+
+
 
                 // create intent and pass to detail activity
                 /* TODO: Intent movieDetailIntent = new Intent(myActivity, DetailActivity.class)
@@ -261,7 +267,7 @@ public class GridFragment extends Fragment implements OnCompleted {
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+            this.mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -271,7 +277,7 @@ public class GridFragment extends Fragment implements OnCompleted {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        this.mListener = null;
     }
 
     /**
