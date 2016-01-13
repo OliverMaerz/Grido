@@ -1,6 +1,6 @@
 package com.olivermaerz.grido;
 
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -49,7 +49,11 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
 
     // interaction with the fragment ...
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onFragmentInteraction(Movies movie) {
+        // create intent and pass to detail activity
+        Intent movieDetailIntent = new Intent(MainActivity.this, DetailActivity.class)
+                .putExtra(Movies.EXTRA_MOVIE, movie);
+        startActivity(movieDetailIntent);
 
     }
 }

@@ -3,7 +3,6 @@ package com.olivermaerz.grido;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -154,6 +153,8 @@ public class GridFragment extends Fragment implements OnCompleted {
                     return;
                 }
 
+                mListener.onFragmentInteraction(movieListObj.get(position));
+
                 // create intent and pass to detail activity
                 /* TODO: Intent movieDetailIntent = new Intent(myActivity, DetailActivity.class)
                         .putExtra(Movies.EXTRA_MOVIE, movieListObj.get(position));
@@ -256,6 +257,9 @@ public class GridFragment extends Fragment implements OnCompleted {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -282,7 +286,7 @@ public class GridFragment extends Fragment implements OnCompleted {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Movies movie);
     }
 
     private void resetGrid() {
