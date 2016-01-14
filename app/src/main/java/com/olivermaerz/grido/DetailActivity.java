@@ -1,21 +1,13 @@
 package com.olivermaerz.grido;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class DetailActivity extends AppCompatActivity {
+
+    private final String LOG_TAG = "DetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,42 +30,33 @@ public class DetailActivity extends AppCompatActivity {
 
 
 
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(Movies.EXTRA_MOVIE)) {
-            //Movies movie = new Movies(intent.getExtras().getParcelable(Movies.EXTRA_MOVIE));
-            Movies movie = intent.getParcelableExtra(Movies.EXTRA_MOVIE);
+        // Check that the activity is using the layout version with
+        // the fragment_container FrameLayout
+        if (findViewById(R.id.fragment_container) != null) {
 
-            // get the strings and double we need from the parcelable (title, rating, description)
-            ((TextView)findViewById(R.id.movieTitle)).setText(movie.originalTitle);
-            ((TextView)findViewById(R.id.rating)).setText(getString(R.string.rated) +
-                    movie.rating + getString(R.string.of_10_points));
-            ((TextView)findViewById(R.id.description)).setText(movie.description);
-
-            // reformat the date so it looks a little nicer and is displayed localized
-            try {
-                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(movie.releaseDate);
-                DateFormat dateFormat =
-                        android.text.format.DateFormat.getDateFormat(getApplicationContext());
-                ((TextView)findViewById(R.id.releaseDate)).setText(getString(R.string.released) +
-                        dateFormat.format(date));
-
-            } catch (ParseException e) {
-                //e.printStackTrace();
-                // error parsing date - they must have change the format - just output string as
-                // received from MovieDB
-                ((TextView)findViewById(R.id.releaseDate)).setText(getString(R.string.released) +
-                        getString(R.string.unknown));
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
             }
 
-
-            // load the image from the poster url into the view (incl. caching, resizing etc.
-            Picasso.with(this)
-                    .load(movie.posterUrl)
-                    .placeholder(R.drawable.loading_image)
-                    .into((ImageView)findViewById(R.id.imageView));
+            // Create a new Fragment to be placed in the activity layout
+            DetailFragment detailFragment = new DetailFragment();
 
 
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            detailFragment.setArguments(getIntent().getExtras());
+
+
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, detailFragment).commit();
         }
+
+
 
 
     }

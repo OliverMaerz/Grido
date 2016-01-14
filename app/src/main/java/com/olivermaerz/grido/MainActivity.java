@@ -1,13 +1,17 @@
 package com.olivermaerz.grido;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements GridFragment.OnFragmentInteractionListener {
+
+    private static final String LOG_TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,24 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
                 return;
             }
 
+            // check for tablets and load the detail fragment ...
+            Configuration config = getResources().getConfiguration();
+            if (config.screenWidthDp >= 820)  {
+                // Create a new Fragment to be placed in the activity layout
+                DetailFragment detailFragment = new DetailFragment();
+
+                // In case this activity was started with special instructions from an
+                // Intent, pass the Intent's extras to the fragment as arguments
+                detailFragment.setArguments(getIntent().getExtras());
+
+                // Add the fragment to the 'fragment_container' FrameLayout
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container_detail, detailFragment).commit();
+
+                Log.v(LOG_TAG, "dual pane fragment added");
+
+            }
+
             // Create a new Fragment to be placed in the activity layout
             GridFragment gridFragment = new GridFragment();
 
@@ -48,6 +70,12 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, gridFragment).commit();
+
+
+
+
+
+
         }
     }
 
@@ -76,7 +104,26 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
         // create intent and pass to detail activity
         Intent movieDetailIntent = new Intent(MainActivity.this, DetailActivity.class)
                 .putExtra(Movies.EXTRA_MOVIE, movie);
-        startActivity(movieDetailIntent);
+
+        Configuration config = getResources().getConfiguration();
+        if (config.screenWidthDp >= 820) {
+
+            // Create a new Fragment to be placed in the activity layout
+            DetailFragment detailFragment = new DetailFragment();
+
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            detailFragment.setArguments(movieDetailIntent.getExtras());
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container_detail, detailFragment).commit();
+
+        } else {
+            startActivity(movieDetailIntent);
+        }
+
+
 
     }
 }

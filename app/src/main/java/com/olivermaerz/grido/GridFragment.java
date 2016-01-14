@@ -1,6 +1,7 @@
 package com.olivermaerz.grido;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -91,14 +92,24 @@ public class GridFragment extends Fragment implements OnCompleted {
         DisplayMetrics displaymetrics = new DisplayMetrics();
 
         this.myActivity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int screenWidth = displaymetrics.widthPixels;
+
+        int screenWidth;
+        Configuration deviceConfig = getResources().getConfiguration();
+        if (deviceConfig.screenWidthDp >= 820) {
+            screenWidth = displaymetrics.widthPixels / 3;
+        } else {
+            screenWidth = displaymetrics.widthPixels;
+        }
+        resetGrid();
+
+        //int viewWidth = this.gridView.getWidth();
 
         // calculate the number of columns based on screen width and scale factor
         int columns = (int) ((float) screenWidth / scaleFactor);
         // but always minimum 2 columns
         if (columns < 2) columns = 2;
 
-        resetGrid();
+
 
         // set number of columns
         this.gridView.setNumColumns(columns);
@@ -141,8 +152,6 @@ public class GridFragment extends Fragment implements OnCompleted {
         }
 
 
-
-
         // listener if movie post is clicked to show the details page
         this.gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -172,6 +181,9 @@ public class GridFragment extends Fragment implements OnCompleted {
 
 
     }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
