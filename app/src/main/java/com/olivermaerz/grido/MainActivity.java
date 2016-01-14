@@ -42,9 +42,9 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
                 return;
             }
 
-            // check for tablets and load the detail fragment ...
+            // check for tablets (min 600 dp) and load the detail fragment (dual pane)
             Configuration config = getResources().getConfiguration();
-            if (config.screenWidthDp >= 820)  {
+            if (config.smallestScreenWidthDp >= 600)  {
                 // Create a new Fragment to be placed in the activity layout
                 DetailFragment detailFragment = new DetailFragment();
 
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
                 .putExtra(Movies.EXTRA_MOVIE, movie);
 
         Configuration config = getResources().getConfiguration();
-        if (config.screenWidthDp >= 820) {
+        if (config.smallestScreenWidthDp >= 600) {
 
             // Create a new Fragment to be placed in the activity layout
             DetailFragment detailFragment = new DetailFragment();

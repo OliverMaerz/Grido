@@ -95,8 +95,9 @@ public class GridFragment extends Fragment implements OnCompleted {
 
         int screenWidth;
         Configuration deviceConfig = getResources().getConfiguration();
-        if (deviceConfig.screenWidthDp >= 820) {
-            screenWidth = displaymetrics.widthPixels / 3;
+        if ((deviceConfig.smallestScreenWidthDp >= 600) && (deviceConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)) {
+            // device is tablet show dual pane with landscape width = 1/3 grid fragment and 2/3 detail fragment
+            screenWidth = displaymetrics.widthPixels / 5 * 2;
         } else {
             screenWidth = displaymetrics.widthPixels;
         }
