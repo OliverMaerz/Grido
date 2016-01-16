@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
 
             // check for tablets (min 600 dp) and load the detail fragment (dual pane)
             Configuration config = getResources().getConfiguration();
-            if (config.smallestScreenWidthDp >= 600)  {
+            if ( (config.smallestScreenWidthDp >= 600) && (findViewById(R.id.fragment_container_detail) != null) )  {
                 // Create a new Fragment to be placed in the activity layout
                 DetailFragment detailFragment = new DetailFragment();
 
@@ -55,6 +55,13 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
                 // Add the fragment to the 'fragment_container' FrameLayout
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container_detail, detailFragment).commit();
+
+                // check if in portrait mode and remove padding at the top
+                Configuration deviceConfig = getResources().getConfiguration();
+                if (deviceConfig.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                    findViewById(R.id.fragment_container_detail).setPadding(0,0,0,0);
+
+                }
 
                 Log.v(LOG_TAG, "dual pane fragment added");
 
