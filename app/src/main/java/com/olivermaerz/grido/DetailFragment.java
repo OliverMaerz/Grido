@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -26,7 +25,8 @@ import java.util.Date;
 public class DetailFragment extends Fragment {
 
     private View view;
-    private ListView listView;
+    //private ListView listView;
+    private NonScrollListView nonScrollListView;
     private Context context;
 
     private ReviewAdapter reviewAdapter;
@@ -91,7 +91,9 @@ public class DetailFragment extends Fragment {
                     .into((ImageView) this.view.findViewById(R.id.imageView));
 
             // list view for reviews
-            listView = (ListView) this.view.findViewById(R.id.reviews_listview);
+            //listView = (ListView) this.view.findViewById(R.id.reviews_listview);
+            this.nonScrollListView = (NonScrollListView) this.view.findViewById(R.id.reviews_listview);
+
 
             Log.v(LOG_TAG, " movie.reviews: " + movie.reviews);
 
@@ -99,7 +101,7 @@ public class DetailFragment extends Fragment {
 
 
             // Assign adapter to ListView
-            listView.setAdapter(this.reviewAdapter);
+            nonScrollListView.setAdapter(this.reviewAdapter);
 
         }
 
