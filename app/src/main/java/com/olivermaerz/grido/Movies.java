@@ -3,6 +3,8 @@ package com.olivermaerz.grido;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * Created by omaerz on 11/25/15.
  */
@@ -12,26 +14,33 @@ public class Movies implements Parcelable {
     public String description;
     public String releaseDate;
     public Double rating;
+    public ArrayList<Reviews> reviews;
     public static final String EXTRA_MOVIE = "com.olivermaerz.grido.EXTRA_MOVIE";
 
+    public Movies() {
+       reviews = new ArrayList<>();
+    }
 
     // write strings into parcel
-    public Movies(String oTitle, String pUrl, String desc, String rDate, Double rating){
+    public Movies(String oTitle, String pUrl, String desc, String rDate, Double rating, ArrayList<Reviews> reviews){
         this.originalTitle = oTitle;
         this.posterUrl = pUrl;
         this.description = desc;
         this.releaseDate = rDate;
         this.rating = rating;
+        this.reviews = reviews;
 
     }
 
     // receive the parcel
     private Movies(Parcel in) {
+        this();
         this.originalTitle = in.readString();
         this.posterUrl = in.readString();
         this.description = in.readString();
         this.releaseDate = in.readString();
         this.rating = in.readDouble();
+        this.reviews = in.readArrayList(Reviews.class.getClassLoader());
         //this.poster = in.read
     }
 

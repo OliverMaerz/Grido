@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -25,7 +26,10 @@ import java.util.Date;
 public class DetailFragment extends Fragment {
 
     private View view;
+    private ListView listView;
     private Context context;
+
+    private ReviewAdapter reviewAdapter;
 
     private final String LOG_TAG = "DetailFragment";
 
@@ -86,6 +90,16 @@ public class DetailFragment extends Fragment {
                     .placeholder(R.drawable.loading_image)
                     .into((ImageView) this.view.findViewById(R.id.imageView));
 
+            // list view for reviews
+            listView = (ListView) this.view.findViewById(R.id.reviews_listview);
+
+            Log.v(LOG_TAG, " movie.reviews: " + movie.reviews);
+
+            this.reviewAdapter = new ReviewAdapter(this.getActivity(), movie.reviews);
+
+
+            // Assign adapter to ListView
+            listView.setAdapter(this.reviewAdapter);
 
         }
 

@@ -3,6 +3,7 @@ package com.olivermaerz.grido;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -169,6 +170,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<Movies>> {
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
+        final String MDB_ID = "id";
         final String MDB_LIST = "results";
         final String MDB_TITLE = "original_title";
         final String MDB_DESCRIPTION = "overview";
@@ -203,15 +205,143 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<Movies>> {
 
             //resultStrs[i] =  builder.build().toString();
 
+            ArrayList<Reviews> reviews = getReviewsForMovie(movie.getString(MDB_ID));
+
             moviesList.add(new Movies(
                     movie.getString(MDB_TITLE),
                     builder.build().toString(),
                     movie.getString(MDB_DESCRIPTION),
                     movie.getString(MDB_RELEASE_DATE),
-                    movie.getDouble(MDB_RATING)));
+                    movie.getDouble(MDB_RATING),
+                    reviews ));
+
         }
+
+        Log.v(LOG_TAG, "moviesList: " + moviesList.toString());
+
         return moviesList;
 
     }
+
+    /**
+     * Call MovieDB API and get reviews for movie
+     */
+
+    private ArrayList<Reviews> getReviewsForMovie(String movieId) {
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        String reviewsJsonString;
+
+        ArrayList<Reviews> reviewsList = new ArrayList<>();
+
+        try {
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("http")
+                    .authority("api.themoviedb.org")
+                    .appendPath("3")
+                    .appendPath("movie")
+                    .appendPath(movieId)
+                    .appendPath("reviews")
+                    .appendQueryParameter("api_key",
+                            this.context.getResources().getString(string.movie_db_api_key));
+
+            URL url = new URL(builder.build().toString());
+
+            //Log.v(LOG_TAG, "Built URI" + builder.build().toString());
+
+            // Create the request to moviedb, and open the connection
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // add newlines for readability when debugging json
+                buffer.append(line + "\n");
+            }
+
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return null;
+            }
+            reviewsJsonString = buffer.toString();
+
+
+            reviewsList = getReviewsFromJson(reviewsJsonString);
+
+            Log.v(LOG_TAG, "- reviews: " + reviewsJsonString);
+
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Internet Connection Error when connection to MovieDB ", e);
+            return null;
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "JSONException Error when parsing reviews ", e);
+            return null;
+        } finally{
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    //Log.e("PlaceholderFragment", "Error closing stream", e);
+                }
+
+
+            }
+        }
+
+        return reviewsList;
+    }
+
+
+    /**
+     * Process String with movie list in JSON Format and pull out the data we need
+     */
+    private ArrayList<Reviews> getReviewsFromJson(String jsonStr)
+            throws JSONException {
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String MDB_LIST = "results";
+        final String MDB_ID = "id";
+        final String MDB_AUTHOR = "author";
+        final String MDB_CONTENT = "content";
+
+        JSONObject reviewsJson = new JSONObject(jsonStr);
+        JSONArray jsonArray = reviewsJson.getJSONArray(MDB_LIST);
+
+
+        //String[] resultStrs = new String[moviesArray.length()];
+        ArrayList<Reviews> reviewsList = new ArrayList<>();
+        for(int i = 0; i < jsonArray.length(); i++) {
+
+            // Get the JSON object representing the day
+            JSONObject movie = jsonArray.getJSONObject(i);
+
+            reviewsList.add(new Reviews(
+                    movie.getString(MDB_ID),
+                    movie.getString(MDB_AUTHOR),
+                    movie.getString(MDB_CONTENT)));
+
+        }
+        Log.v(LOG_TAG, "reviewsList: " + reviewsList.toString());
+
+        return reviewsList;
+
+    }
+
+
 
 }
