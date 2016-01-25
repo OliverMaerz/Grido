@@ -8,21 +8,17 @@
     android:padding="16dp"
     android:gravity="top">
 
-
     <TextView
         android:id="@+id/review_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:textSize="16sp" />
+        android:textAppearance="?android:attr/textAppearanceSmall" />
     <TextView
         android:id="@+id/review_author"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        />
-
-
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </LinearLayout>

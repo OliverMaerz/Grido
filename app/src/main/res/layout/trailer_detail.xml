@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="10dp"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:padding="16dp"
+    android:gravity="top">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding_play_button"
+        android:paddingRight="@dimen/padding_play_button"
+        android:id="@+id/trailer_button"
+        android:text="@string/play_trailer"
+        android:textColor="#FFFFFF"
+        android:drawableLeft="@drawable/ic_play_circle_filled_white_24dp"
+        android:drawablePadding="@dimen/padding_play_button"
+        android:background="@color/colorAccent"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding_play_button"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/trailer_text"
+        android:layout_gravity="center"/>
+
+</LinearLayout>

@@ -108,10 +108,10 @@ public class MainActivity extends AppCompatActivity implements GridFragment.OnFr
 
     // interaction with the fragment ...
     @Override
-    public void onFragmentInteraction(Movies movie) {
+    public void onFragmentInteraction(MdbMovie movie) {
         // create intent and pass to detail activity
         Intent movieDetailIntent = new Intent(MainActivity.this, DetailActivity.class)
-                .putExtra(Movies.EXTRA_MOVIE, movie);
+                .putExtra(MdbMovie.EXTRA_MOVIE, movie);
 
         Configuration config = getResources().getConfiguration();
         if (config.smallestScreenWidthDp >= 600) {

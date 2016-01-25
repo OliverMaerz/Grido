@@ -33,7 +33,7 @@ public class GridFragment extends Fragment implements OnCompleted {
     }
 
     public ImageAdapter imageAdapter;
-    private ArrayList<Movies> movieListObj;
+    private ArrayList<MdbMovie> movieListObj;
 
     // object to hold all configurations
     private Config config;
@@ -144,7 +144,7 @@ public class GridFragment extends Fragment implements OnCompleted {
             movieListObj = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
             this.gridView.setAdapter(imageAdapter);
             imageAdapter.setWidth(this.imageWidth);
-            for (Movies movie : movieListObj){
+            for (MdbMovie movie : movieListObj){
                 imageAdapter.add(movie.getPosterUrl());
                 Log.v(LOG_TAG, "Recovered MoviePoster: " + movie.getPosterUrl());
 
@@ -158,7 +158,7 @@ public class GridFragment extends Fragment implements OnCompleted {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
                 // get data from clicked movie poster and assign to 'movie'
-                Movies movie = movieListObj.get(position);
+                MdbMovie movie = movieListObj.get(position);
 
                 if (movie == null) {
                     return;
@@ -173,7 +173,7 @@ public class GridFragment extends Fragment implements OnCompleted {
 
                 // create intent and pass to detail activity
                 /* TODO: Intent movieDetailIntent = new Intent(myActivity, DetailActivity.class)
-                        .putExtra(Movies.EXTRA_MOVIE, movieListObj.get(position));
+                        .putExtra(mdbMovie.EXTRA_MOVIE, mdbMovieListObj.get(position));
                 startActivity(movieDetailIntent);*/
 
             }
@@ -261,7 +261,7 @@ public class GridFragment extends Fragment implements OnCompleted {
      * that contains the list of movies etc.
      */
     @Override
-    public void onTaskCompleted(ArrayList<Movies> movieListObj) {
+    public void onTaskCompleted(ArrayList<MdbMovie> movieListObj) {
         // callback from AsyncTask returns the movieListObj here
         this.movieListObj = movieListObj;
 
@@ -305,7 +305,7 @@ public class GridFragment extends Fragment implements OnCompleted {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Movies movie);
+        void onFragmentInteraction(MdbMovie movie);
     }
 
     private void resetGrid() {

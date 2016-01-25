@@ -19,13 +19,16 @@
             <include layout="@layout/movie_detail"/>
 
             <com.olivermaerz.grido.NonScrollListView
-                android:id="@+id/reviews_listview"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
+                android:id="@+id/trailers_listview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
             </com.olivermaerz.grido.NonScrollListView>
-            
+
+            <com.olivermaerz.grido.NonScrollListView
+                android:id="@+id/reviews_listview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </com.olivermaerz.grido.NonScrollListView>
         </LinearLayout>
 
     </ScrollView>

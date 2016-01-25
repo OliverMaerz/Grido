@@ -25,11 +25,11 @@ import java.util.Date;
 public class DetailFragment extends Fragment {
 
     private View view;
-    //private ListView listView;
-    private NonScrollListView nonScrollListView;
+    private NonScrollListView reviewListView;
+    private NonScrollListView trailerListView;
     private Context context;
-
     private ReviewAdapter reviewAdapter;
+    private TrailerAdapter trailerAdapter;
 
     private final String LOG_TAG = "DetailFragment";
 
@@ -55,11 +55,7 @@ public class DetailFragment extends Fragment {
         Bundle extras = getArguments();
 
         if (extras != null) {
-            //Movies movie = new Movies(intent.getExtras().getParcelable(Movies.EXTRA_MOVIE));
-            //Movies movie = intent.getParcelableExtra(Movies.EXTRA_MOVIE);
-            Movies movie = extras.getParcelable(Movies.EXTRA_MOVIE);
-
-            Log.v(LOG_TAG, movie.originalTitle);
+            MdbMovie movie = extras.getParcelable(MdbMovie.EXTRA_MOVIE);
 
             // get the strings and double we need from the parcelable (title, rating, description)
             ((TextView) this.view.findViewById(R.id.movieTitle)).setText(movie.originalTitle);
@@ -84,24 +80,26 @@ public class DetailFragment extends Fragment {
             }
 
 
+
             // load the image from the poster url into the view (incl. caching, resizing etc.
             Picasso.with(this.getActivity())
                     .load(movie.posterUrl)
                     .placeholder(R.drawable.loading_image)
                     .into((ImageView) this.view.findViewById(R.id.imageView));
 
-            // list view for reviews
-            //listView = (ListView) this.view.findViewById(R.id.reviews_listview);
-            this.nonScrollListView = (NonScrollListView) this.view.findViewById(R.id.reviews_listview);
-
+            // listviews for reviews and trailers
+            this.reviewListView = (NonScrollListView) this.view.findViewById(R.id.reviews_listview);
+            this.trailerListView = (NonScrollListView) this.view.findViewById(R.id.trailers_listview);
 
             Log.v(LOG_TAG, " movie.reviews: " + movie.reviews);
 
+            // instantiate adapters for reviews and trailers
             this.reviewAdapter = new ReviewAdapter(this.getActivity(), movie.reviews);
+            this.trailerAdapter = new TrailerAdapter(this.getActivity(), movie.trailers);
 
-
-            // Assign adapter to ListView
-            nonScrollListView.setAdapter(this.reviewAdapter);
+            // Assign adapters to ListView
+            reviewListView.setAdapter(this.reviewAdapter);
+            trailerListView.setAdapter(this.trailerAdapter);
 
         }
 

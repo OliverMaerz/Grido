@@ -14,9 +14,9 @@ import java.util.ArrayList;
  * Package: com.olivermaerz.grido
  * Created by omaerz on 1/17/16.
  */
-public class ReviewAdapter extends ArrayAdapter<Reviews> {
+public class ReviewAdapter extends ArrayAdapter<Review> {
 
-    //private ArrayList<Reviews> reviews;
+    //private ArrayList<Review> review;
 
     private static final String LOG_TAG = ReviewAdapter.class.getSimpleName();
     /**
@@ -27,7 +27,7 @@ public class ReviewAdapter extends ArrayAdapter<Reviews> {
      * @param context   The current context. Used to inflate the layout file.
      * @param reviews   A List of reviews objects to display in a list
      */
-    public ReviewAdapter(Activity context, ArrayList<Reviews> reviews) {
+    public ReviewAdapter(Activity context, ArrayList<Review> reviews) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
         // Because this is a custom adapter for two TextViews, the adapter is not
@@ -47,8 +47,8 @@ public class ReviewAdapter extends ArrayAdapter<Reviews> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Gets the Reviews object from the ArrayAdapter at the appropriate position
-        Reviews reviews = getItem(position);
+        // Gets the Review object from the ArrayAdapter at the appropriate position
+        Review review = getItem(position);
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
@@ -59,13 +59,13 @@ public class ReviewAdapter extends ArrayAdapter<Reviews> {
         }
 
         TextView content = (TextView) convertView.findViewById(R.id.review_content);
-        content.setText(reviews.content); //
+        content.setText(review.content); //
 
         TextView author = (TextView) convertView.findViewById(R.id.review_author);
-        author.setText(reviews.author);
+        author.setText(review.author);
 
-        Log.v(LOG_TAG, " position " + position + " author: " + reviews.author);
-        Log.v(LOG_TAG, " content: " + reviews.content);
+        Log.v(LOG_TAG, " position " + position + " author: " + review.author);
+        Log.v(LOG_TAG, " content: " + review.content);
 
 
         return convertView;

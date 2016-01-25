@@ -7,5 +7,5 @@ import java.util.ArrayList;
  * Interface to allow FetchMovies pass back movieListObj to the caller (MainActivity in this case).
  */
 public interface OnCompleted {
-    void onTaskCompleted(ArrayList<Movies> movieListObj);
+    void onTaskCompleted(ArrayList<MdbMovie> movieListObj);
 }

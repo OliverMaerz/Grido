@@ -6,14 +6,14 @@ import android.os.Parcelable;
 /**
  * Created by omaerz on 11/25/15.
  */
-public class Reviews implements Parcelable {
+public class Review implements Parcelable {
     public String id;
     public String author;
     public String content;
 
 
     // write strings into parcel
-    public Reviews(String id, String author, String content){
+    public Review(String id, String author, String content){
         this.id = id;
         this.author = author;
         this.content = content;
@@ -21,7 +21,7 @@ public class Reviews implements Parcelable {
     }
 
     // receive the parcel
-    private Reviews(Parcel in) {
+    private Review(Parcel in) {
         this.id = in.readString();
         this.author = in.readString();
         this.content = in.readString();
@@ -40,16 +40,16 @@ public class Reviews implements Parcelable {
     }
 
 
-    public static final Creator<Reviews> CREATOR = new Creator<Reviews>() {
+    public static final Creator<Review> CREATOR = new Creator<Review>() {
         // calls our new constructor an pass along the un-marshaled `Parcel` and then return the new object
         @Override
-        public Reviews createFromParcel(Parcel in) {
-            return new Reviews(in);
+        public Review createFromParcel(Parcel in) {
+            return new Review(in);
         }
 
         @Override
-        public Reviews[] newArray(int size) {
-            return new Reviews[size];
+        public Review[] newArray(int size) {
+            return new Review[size];
         }
     };
 }
