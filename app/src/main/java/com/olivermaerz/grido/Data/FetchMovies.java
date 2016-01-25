@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.data;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,9 +7,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.olivermaerz.grido.adapter.ImageAdapter;
-import com.olivermaerz.grido.data.MdbMovie;
-import com.olivermaerz.grido.data.Review;
-import com.olivermaerz.grido.data.Trailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;

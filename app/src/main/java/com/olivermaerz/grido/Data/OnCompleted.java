@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.data;
 
 import com.olivermaerz.grido.data.MdbMovie;
 

@@ -17,8 +17,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.olivermaerz.grido.Config;
-import com.olivermaerz.grido.FetchMovies;
-import com.olivermaerz.grido.OnCompleted;
+import com.olivermaerz.grido.data.FetchMovies;
+import com.olivermaerz.grido.data.OnCompleted;
 import com.olivermaerz.grido.R;
 import com.olivermaerz.grido.adapter.ImageAdapter;
 import com.olivermaerz.grido.data.MdbMovie;
