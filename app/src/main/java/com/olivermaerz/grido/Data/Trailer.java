@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

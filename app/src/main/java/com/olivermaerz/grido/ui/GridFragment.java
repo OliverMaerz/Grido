@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.ui;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -15,6 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+
+import com.olivermaerz.grido.Config;
+import com.olivermaerz.grido.FetchMovies;
+import com.olivermaerz.grido.OnCompleted;
+import com.olivermaerz.grido.R;
+import com.olivermaerz.grido.adapter.ImageAdapter;
+import com.olivermaerz.grido.data.MdbMovie;
 
 import java.util.ArrayList;
 

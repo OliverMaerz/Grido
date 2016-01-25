@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;

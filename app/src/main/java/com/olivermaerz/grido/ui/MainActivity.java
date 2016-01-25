@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.ui;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -8,6 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.olivermaerz.grido.R;
+import com.olivermaerz.grido.data.MdbMovie;
 
 public class MainActivity extends AppCompatActivity implements GridFragment.OnFragmentInteractionListener {
 

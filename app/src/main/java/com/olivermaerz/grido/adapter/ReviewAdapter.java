@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.adapter;
 
 import android.app.Activity;
 import android.util.Log;
@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.olivermaerz.grido.R;
+import com.olivermaerz.grido.data.Review;
 
 import java.util.ArrayList;
 

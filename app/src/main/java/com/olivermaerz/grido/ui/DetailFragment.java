@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.olivermaerz.grido.R;
+import com.olivermaerz.grido.adapter.ReviewAdapter;
+import com.olivermaerz.grido.adapter.TrailerAdapter;
+import com.olivermaerz.grido.data.MdbMovie;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;

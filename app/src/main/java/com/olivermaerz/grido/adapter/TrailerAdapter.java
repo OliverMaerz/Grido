@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.adapter;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -7,6 +7,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.olivermaerz.grido.R;
+import com.olivermaerz.grido.data.Trailer;
+import com.olivermaerz.grido.ui.TrailerButtonOnClickListener;
 
 import java.util.ArrayList;
 
@@ -62,7 +66,6 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
                 content.setText(trailer.name); //
 
                 Button playButton = (Button) convertView.findViewById(R.id.trailer_button);
-                playButton.setText("Play!");
 
                 // TrailerButtonOnClickListener starts youtube intent for trailer.source (youtube video id)
                 playButton.setOnClickListener(new TrailerButtonOnClickListener(convertView.getContext(), trailer.source ));
