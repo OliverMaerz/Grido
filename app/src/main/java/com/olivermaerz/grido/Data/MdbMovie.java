@@ -48,7 +48,6 @@ public class MdbMovie implements Parcelable {
         this.detailsRetrieved = in.readByte() != 0; //detailsRetrieved == true if byte != 0
         this.reviews = in.readArrayList(Review.class.getClassLoader());
         this.trailers = in.readArrayList(Trailer.class.getClassLoader());
-        //this.poster = in.read
     }
 
     @Override
@@ -64,9 +63,8 @@ public class MdbMovie implements Parcelable {
         dest.writeString(this.releaseDate);
         dest.writeDouble(this.rating);
         dest.writeByte((byte) (this.detailsRetrieved ? 1 : 0));
-        dest.writeTypedList(this.reviews);
-        dest.writeTypedList(this.trailers);
-
+        dest.writeList(this.reviews);
+        dest.writeList(this.trailers);
     }
 
     public String getPosterUrl() {
