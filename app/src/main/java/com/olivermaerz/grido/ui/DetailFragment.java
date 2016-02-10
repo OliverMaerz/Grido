@@ -17,6 +17,9 @@ import com.olivermaerz.grido.R;
 import com.olivermaerz.grido.adapter.ReviewAdapter;
 import com.olivermaerz.grido.adapter.TrailerAdapter;
 import com.olivermaerz.grido.data.MdbMovie;
+import com.olivermaerz.grido.data.Review;
+import com.olivermaerz.grido.provider.favorite.FavoriteContentValues;
+import com.olivermaerz.grido.provider.review.ReviewContentValues;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -76,7 +79,7 @@ public class DetailFragment extends Fragment {
                     Snackbar.make(view, "Added to favorites", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    saveFavoriteToDatabase(movie.id, movie.originalTitle);
+                    saveFavoriteToDatabase(movie);
                     // change the heart icon to solid when movie is favorite
                     favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
 
@@ -140,7 +143,29 @@ public class DetailFragment extends Fragment {
         this.context = context;
     }
 
-    private void saveFavoriteToDatabase(int movieID, String movieName) {
+    private void saveFavoriteToDatabase(MdbMovie movie) {
+        FavoriteContentValues favValues = new FavoriteContentValues();
+        favValues.putOriginaltitle(movie.originalTitle)
+                .putRated(movie.rating.toString())
+                .putDescription(movie.description)
+                .putReleasedate(movie.releaseDate)
+                .putPoster(movie.posterUrl);
+        context.getContentResolver().insert(favValues.uri(), favValues.values());
+
+        ReviewContentValues[] revValues = new  ReviewContentValues[movie.reviews.size()];
+
+        int i = 0;
+        for (Review review: movie.reviews) {
+            revValues[i].putContent(review.content).putAuthor(review.author);
+            i++;
+        }
+
+        context.getContentResolver().bulkInsert(revValues[0].uri(), revValues.);
+
+
+        context.getContentResolver().bulkInsert()
+
+
 
     }
 

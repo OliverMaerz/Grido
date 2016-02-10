@@ -1,12 +1,12 @@
-package com.olivermaerz.grido.trailer;
+package com.olivermaerz.grido.provider.trailer;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import com.olivermaerz.grido.FavoritesProvider;
-import com.olivermaerz.grido.favorite.FavoriteColumns;
-import com.olivermaerz.grido.review.ReviewColumns;
-import com.olivermaerz.grido.trailer.TrailerColumns;
+import com.olivermaerz.grido.provider.FavoritesProvider;
+import com.olivermaerz.grido.provider.favorite.FavoriteColumns;
+import com.olivermaerz.grido.provider.review.ReviewColumns;
+import com.olivermaerz.grido.provider.trailer.TrailerColumns;
 
 /**
  * Movie trailers

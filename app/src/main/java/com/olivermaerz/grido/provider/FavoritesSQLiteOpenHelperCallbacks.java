@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.provider;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

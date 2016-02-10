@@ -1,8 +1,6 @@
-package com.olivermaerz.grido.favorite;
+package com.olivermaerz.grido.provider.favorite;
 
-import com.olivermaerz.grido.base.BaseModel;
-
-import java.util.Date;
+import com.olivermaerz.grido.provider.base.BaseModel;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

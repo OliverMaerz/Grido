@@ -1,11 +1,8 @@
-package com.olivermaerz.grido.trailer;
+package com.olivermaerz.grido.provider.trailer;
 
-import com.olivermaerz.grido.base.BaseModel;
-
-import java.util.Date;
+import com.olivermaerz.grido.provider.base.BaseModel;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * Movie trailers

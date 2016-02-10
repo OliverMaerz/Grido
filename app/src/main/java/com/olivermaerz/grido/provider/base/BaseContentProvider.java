@@ -1,4 +1,4 @@
-package com.olivermaerz.grido.base;
+package com.olivermaerz.grido.provider.base;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 public abstract class BaseContentProvider extends ContentProvider {

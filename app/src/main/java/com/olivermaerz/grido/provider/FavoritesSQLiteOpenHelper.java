@@ -1,4 +1,4 @@
-package com.olivermaerz.grido;
+package com.olivermaerz.grido.provider;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,9 +10,9 @@ import android.os.Build;
 import android.util.Log;
 
 import com.olivermaerz.grido.BuildConfig;
-import com.olivermaerz.grido.favorite.FavoriteColumns;
-import com.olivermaerz.grido.review.ReviewColumns;
-import com.olivermaerz.grido.trailer.TrailerColumns;
+import com.olivermaerz.grido.provider.favorite.FavoriteColumns;
+import com.olivermaerz.grido.provider.review.ReviewColumns;
+import com.olivermaerz.grido.provider.trailer.TrailerColumns;
 
 public class FavoritesSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = FavoritesSQLiteOpenHelper.class.getSimpleName();

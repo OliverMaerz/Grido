@@ -1,12 +1,10 @@
-package com.olivermaerz.grido.favorite;
-
-import java.util.Date;
+package com.olivermaerz.grido.provider.favorite;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.olivermaerz.grido.base.AbstractCursor;
+import com.olivermaerz.grido.provider.base.AbstractCursor;
 
 /**
  * Cursor wrapper for the {@code favorite} table.

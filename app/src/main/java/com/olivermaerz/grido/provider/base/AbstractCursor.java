@@ -1,11 +1,10 @@
-package com.olivermaerz.grido.base;
+package com.olivermaerz.grido.provider.base;
 
 import java.util.Date;
 import java.util.HashMap;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
-import android.provider.BaseColumns;
 
 public abstract class AbstractCursor extends CursorWrapper {
     private final HashMap<String, Integer> mColumnIndexes;

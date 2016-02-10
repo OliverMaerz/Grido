@@ -1,6 +1,4 @@
-package com.olivermaerz.grido.favorite;
-
-import java.util.Date;
+package com.olivermaerz.grido.provider.favorite;
 
 import android.content.Context;
 import android.content.ContentResolver;
@@ -8,7 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.olivermaerz.grido.base.AbstractContentValues;
+import com.olivermaerz.grido.provider.base.AbstractContentValues;
 
 /**
  * Content values wrapper for the {@code favorite} table.

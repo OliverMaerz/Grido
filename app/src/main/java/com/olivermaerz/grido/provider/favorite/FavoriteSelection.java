@@ -1,13 +1,11 @@
-package com.olivermaerz.grido.favorite;
-
-import java.util.Date;
+package com.olivermaerz.grido.provider.favorite;
 
 import android.content.Context;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.olivermaerz.grido.base.AbstractSelection;
+import com.olivermaerz.grido.provider.base.AbstractSelection;
 
 /**
  * Selection for the {@code favorite} table.

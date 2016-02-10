@@ -1,20 +1,19 @@
-package com.olivermaerz.grido;
-
-import java.util.Arrays;
+package com.olivermaerz.grido.provider;
 
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.olivermaerz.grido.BuildConfig;
-import com.olivermaerz.grido.base.BaseContentProvider;
-import com.olivermaerz.grido.favorite.FavoriteColumns;
-import com.olivermaerz.grido.review.ReviewColumns;
-import com.olivermaerz.grido.trailer.TrailerColumns;
+import com.olivermaerz.grido.provider.base.BaseContentProvider;
+import com.olivermaerz.grido.provider.favorite.FavoriteColumns;
+import com.olivermaerz.grido.provider.review.ReviewColumns;
+import com.olivermaerz.grido.provider.trailer.TrailerColumns;
+
+import java.util.Arrays;
 
 public class FavoritesProvider extends BaseContentProvider {
     private static final String TAG = FavoritesProvider.class.getSimpleName();

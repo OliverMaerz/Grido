@@ -1,4 +1,4 @@
-package com.olivermaerz.grido.base;
+package com.olivermaerz.grido.provider.base;
 
 import android.content.Context;
 import android.content.ContentResolver;
