@@ -63,14 +63,12 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
                 }
 
                 TextView content = (TextView) convertView.findViewById(R.id.trailer_text);
-                content.setText(trailer.name); //
+                content.setText(trailer.name);
 
                 Button playButton = (Button) convertView.findViewById(R.id.trailer_button);
 
                 // TrailerButtonOnClickListener starts youtube intent for trailer.source (youtube video id)
                 playButton.setOnClickListener(new TrailerButtonOnClickListener(convertView.getContext(), trailer.source ));
-
-
 
                 return convertView;
         }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * Created by omaerz on 11/25/15.
  */
 public class MdbMovie implements Parcelable {
+    public int id;
     public String originalTitle;
     public String posterUrl;
     public String description;
@@ -24,7 +25,8 @@ public class MdbMovie implements Parcelable {
     }
 
     // write data into parcel
-    public MdbMovie(String oTitle, String pUrl, String desc, String rDate, Double rating, Boolean detailsRetrieved, ArrayList<Review> reviews, ArrayList<Trailer> trailers){
+    public MdbMovie(int id, String oTitle, String pUrl, String desc, String rDate, Double rating, Boolean detailsRetrieved, ArrayList<Review> reviews, ArrayList<Trailer> trailers){
+        this.id = id;
         this.originalTitle = oTitle;
         this.posterUrl = pUrl;
         this.description = desc;
@@ -40,6 +42,7 @@ public class MdbMovie implements Parcelable {
     private MdbMovie(Parcel in) {
         this();
 
+        this.id = in.readInt();
         this.originalTitle = in.readString();
         this.posterUrl = in.readString();
         this.description = in.readString();
@@ -57,6 +60,7 @@ public class MdbMovie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
         dest.writeString(this.originalTitle);
         dest.writeString(this.posterUrl);
         dest.writeString(this.description);

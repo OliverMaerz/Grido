@@ -209,6 +209,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
             //resultStrs[i] =  builder.build().toString();
 
             MdbMovie movie = new MdbMovie(
+                    jsonMovie.getInt(MDB_ID),
                     jsonMovie.getString(MDB_TITLE),
                     builder.build().toString(),
                     jsonMovie.getString(MDB_DESCRIPTION),

@@ -1,7 +1,5 @@
 package com.olivermaerz.grido.data;
 
-import com.olivermaerz.grido.data.MdbMovie;
-
 import java.util.ArrayList;
 
 /**

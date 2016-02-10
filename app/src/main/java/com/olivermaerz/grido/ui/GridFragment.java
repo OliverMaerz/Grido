@@ -1,10 +1,10 @@
 package com.olivermaerz.grido.ui;
 
 import android.app.Activity;
-import android.content.res.Configuration;
-import android.support.v4.app.Fragment;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +17,11 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.olivermaerz.grido.Config;
-import com.olivermaerz.grido.data.FetchMovies;
-import com.olivermaerz.grido.data.OnCompleted;
 import com.olivermaerz.grido.R;
 import com.olivermaerz.grido.adapter.ImageAdapter;
+import com.olivermaerz.grido.data.FetchMovies;
 import com.olivermaerz.grido.data.MdbMovie;
+import com.olivermaerz.grido.data.OnCompleted;
 
 import java.util.ArrayList;
 
@@ -224,8 +224,15 @@ public class GridFragment extends Fragment implements OnCompleted {
         // Inflate the menu; this adds items to the action bar if it is present.
         //myActivity.getMenuInflater().inflate(R.menu.menu_main, menu);
         inflater.inflate(R.menu.menu_main, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
+
+
+
+
+
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -247,11 +254,15 @@ public class GridFragment extends Fragment implements OnCompleted {
                 config.sortOrder = RATING;
                 // change the text of the menu item
                 item.setTitle(R.string.sort_by_popularity);
-            } else {
+            } else if (config.sortOrder.equals(RATING)) {
                 // set sort order to rating:
                 config.sortOrder = POPULARITY;
                 // change the text of the menu item
                 item.setTitle(R.string.sort_by_rating);
+            } else {
+                //this.getContext().getContentResolver().query(Uri.parse("content://com.olivermaerz.grido/fireworks/1"));
+                //                retrieveFavoritesFromDatabase();
+
             }
             // and reload the MovieDB data with the new sort order
             FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);

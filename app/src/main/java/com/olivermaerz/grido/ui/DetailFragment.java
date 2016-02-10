@@ -3,11 +3,13 @@ package com.olivermaerz.grido.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -55,11 +57,32 @@ public class DetailFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
 
+
+
         //Intent intent = getIntent();
         Bundle extras = getArguments();
 
         if (extras != null) {
-            MdbMovie movie = extras.getParcelable(MdbMovie.EXTRA_MOVIE);
+            final MdbMovie movie = extras.getParcelable(MdbMovie.EXTRA_MOVIE);
+            final ImageButton favoriteButton = (ImageButton) this.view.findViewById(R.id.favorite);
+
+            // button is invisible by default - make visible
+            favoriteButton.setVisibility(View.VISIBLE);
+
+            // set listener when favorites button is clicked
+            favoriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Snackbar.make(view, "Added to favorites", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
+                    saveFavoriteToDatabase(movie.id, movie.originalTitle);
+                    // change the heart icon to solid when movie is favorite
+                    favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
+
+                }
+            });
+
 
             // get the strings and double we need from the parcelable (title, rating, description)
             ((TextView) this.view.findViewById(R.id.movieTitle)).setText(movie.originalTitle);
@@ -93,7 +116,8 @@ public class DetailFragment extends Fragment {
 
             // listviews for reviews and trailers
             this.reviewListView = (NonScrollListView) this.view.findViewById(R.id.reviews_listview);
-            this.trailerListView = (NonScrollListView) this.view.findViewById(R.id.trailers_listview);
+            this.trailerListView = (NonScrollListView)
+                    this.view.findViewById(R.id.trailers_listview);
 
             Log.v(LOG_TAG, " movie.reviews: " + movie.reviews);
 
@@ -115,4 +139,12 @@ public class DetailFragment extends Fragment {
 
         this.context = context;
     }
+
+    private void saveFavoriteToDatabase(int movieID, String movieName) {
+
+    }
+
+
+
+
 }
