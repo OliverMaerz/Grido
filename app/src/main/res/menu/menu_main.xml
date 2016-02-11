@@ -2,11 +2,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.MainActivity">
-
-
-    <item
-        android:id="@+id/change_sort_order"
-        android:orderInCategory="50"
-        android:title="@string/sort_by_rating"
-        app:showAsAction="never" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/sort_by_popularity"
+            android:checked="true"
+            android:orderInCategory="10"
+            android:title="@string/sort_by_popularity"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/sort_by_rating"
+            android:orderInCategory="20"
+            android:title="@string/sort_by_rating"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/show_favorites"
+            android:orderInCategory="30"
+            android:title="@string/show_favorites"
+            app:showAsAction="never" />
+    </group>
 </menu>

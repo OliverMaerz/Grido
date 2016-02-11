@@ -3,6 +3,7 @@ package com.olivermaerz.grido.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.olivermaerz.grido.Config;
 import com.olivermaerz.grido.R;
@@ -22,6 +24,7 @@ import com.olivermaerz.grido.adapter.ImageAdapter;
 import com.olivermaerz.grido.data.FetchMovies;
 import com.olivermaerz.grido.data.MdbMovie;
 import com.olivermaerz.grido.data.OnCompleted;
+import com.olivermaerz.grido.provider.favorite.FavoriteColumns;
 
 import java.util.ArrayList;
 
@@ -51,6 +54,7 @@ public class GridFragment extends Fragment implements OnCompleted {
     // default sort order
     private static final String POPULARITY = "popularity.desc";
     private static final String RATING = "vote_average.desc";
+    private static final String FAVORITES = "favorites";
 
     // STATE_CONFIG: key in parcelable to store sort order
     private static final String STATE_CONFIG = "gridoConfig";
@@ -241,36 +245,58 @@ public class GridFragment extends Fragment implements OnCompleted {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        Log.v(LOG_TAG, "Menu item clicked: " + id + " R.id.change_sort_order would be " + R.id.change_sort_order);
+
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.change_sort_order) {
-
-            // clear the gridView
-            resetGrid();
-
-            if (config.sortOrder.equals(POPULARITY)) {
-                // sort order was popularity before - now set it to rating:
-                config.sortOrder = RATING;
-                // change the text of the menu item
-                item.setTitle(R.string.sort_by_popularity);
-            } else if (config.sortOrder.equals(RATING)) {
-                // set sort order to rating:
+        if (id == R.id.sort_by_popularity) {
+            if (!config.sortOrder.equals(POPULARITY)) {
+                item.setChecked(true);
+                resetGrid();
                 config.sortOrder = POPULARITY;
-                // change the text of the menu item
-                item.setTitle(R.string.sort_by_rating);
-            } else {
-                //this.getContext().getContentResolver().query(Uri.parse("content://com.olivermaerz.grido/fireworks/1"));
-                //                retrieveFavoritesFromDatabase();
+                // reload the MovieDB data with the new sort order
+                FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
+                fetchMovies.execute();
+
 
             }
-            // and reload the MovieDB data with the new sort order
-            FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
-            fetchMovies.execute();
+        } else if (id == R.id.sort_by_rating) {
+            if (!config.sortOrder.equals(RATING)) {
+                item.setChecked(true);
+                resetGrid();
+                config.sortOrder = RATING;
+                // reload the MovieDB data with the new sort order
+                FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
+                fetchMovies.execute();
 
-            return true;
+            }
+
+        } else if (id == R.id.show_favorites) {
+            if (!config.sortOrder.equals(FAVORITES)) {
+
+                // check if there are favorites stored
+
+                Cursor cursor = getContext().getContentResolver().query(FavoriteColumns.CONTENT_URI, null,
+                        null, null, null);
+
+                if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
+                    Toast.makeText(getActivity(), R.string.no_favorites_found,
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    // favorites exist
+                    item.setChecked(true);
+                    resetGrid();
+                    config.sortOrder = FAVORITES;
+                    FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
+                    fetchMovies.execute();
+                }
+                cursor.close();
+
+
+            }
 
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 

@@ -25,7 +25,7 @@ public class MdbMovie implements Parcelable {
     }
 
     // write data into parcel
-    public MdbMovie(int id, String oTitle, String pUrl, String desc, String rDate, Double rating, Boolean detailsRetrieved, ArrayList<Review> reviews, ArrayList<Trailer> trailers){
+    public MdbMovie(long id, String oTitle, String pUrl, String desc, String rDate, Double rating, Boolean detailsRetrieved, ArrayList<Review> reviews, ArrayList<Trailer> trailers){
         this.id = id;
         this.originalTitle = oTitle;
         this.posterUrl = pUrl;
@@ -42,7 +42,7 @@ public class MdbMovie implements Parcelable {
     private MdbMovie(Parcel in) {
         this();
 
-        this.id = in.readInt();
+        this.id = in.readLong();
         this.originalTitle = in.readString();
         this.posterUrl = in.readString();
         this.description = in.readString();
@@ -66,6 +66,10 @@ public class MdbMovie implements Parcelable {
         dest.writeString(this.description);
         dest.writeString(this.releaseDate);
         dest.writeDouble(this.rating);
+        // just in case if detailsRetrieved is null ... then set it to false
+        if (this.detailsRetrieved == null) {
+            this.detailsRetrieved = false;
+        }
         dest.writeByte((byte) (this.detailsRetrieved ? 1 : 0));
         dest.writeList(this.reviews);
         dest.writeList(this.trailers);

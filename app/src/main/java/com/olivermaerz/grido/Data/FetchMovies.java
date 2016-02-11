@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.olivermaerz.grido.adapter.ImageAdapter;
+import com.olivermaerz.grido.provider.favorite.FavoriteCursor;
+import com.olivermaerz.grido.provider.favorite.FavoriteSelection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,7 +77,7 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
 
 
     /**
-     * Call the MovieDB API and get the list of movies
+     * Call the MovieDB API or for favorites query content provider and get the list of movies
      * @param params
      * @return
      */
@@ -84,80 +86,111 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
 
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
         //String[] moviesArray = null;
         ArrayList<MdbMovie> mdbMovieList = new ArrayList<>();
 
-        // Will contain the raw JSON response as a string.
-        String moviesJsonString = null;
 
-        try {
-            Uri.Builder builder = new Uri.Builder();
-            builder.scheme("http")
-                    .authority("api.themoviedb.org")
-                    .appendPath("3")
-                    .appendPath("discover")
-                    .appendPath("movie")
-                    .appendQueryParameter("sort_by", this.sortOrder)
-                    .appendQueryParameter("vote_count.gte", "100")
-                    .appendQueryParameter("api_key",
-                            this.context.getResources().getString(string.movie_db_api_key));
+        Log.v(LOG_TAG, "doInBackground - sortorder = " + this.sortOrder);
+        if (this.sortOrder.equals("favorites") ) {
+            Log.v(LOG_TAG, "doInBackground - favorites selected");
+            // user wants to see favorites ... query content provider
+            FavoriteSelection favoriteSelection = new FavoriteSelection();
+            FavoriteCursor favoriteCursor = favoriteSelection.query(context);
 
-            URL url = new URL(builder.build().toString());
+            //Cursor favoriteCursor = context.getContentResolver().query(FavoriteColumns.CONTENT_URI,null,null,null,null);
 
-            //Log.v(LOG_TAG, "Built movie URI: " + builder.build().toString());
+            while (favoriteCursor.moveToNext()) {
+                MdbMovie movie = new MdbMovie();
+                movie.id = favoriteCursor.getMovieId();
+                movie.originalTitle = favoriteCursor.getOriginaltitle();
+                movie.description = favoriteCursor.getDescription();
+                movie.posterUrl = favoriteCursor.getPoster();
+                movie.rating = Double.parseDouble(favoriteCursor.getRated());
+                movie.releaseDate = favoriteCursor.getReleasedate();
 
-            // Create the request to moviedb, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+                movie.reviews = new ArrayList<>();
+                movie.trailers = new ArrayList<>();
 
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return null;
+                mdbMovieList.add(movie);
+
+
             }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
+            favoriteCursor.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // add newlines for readability when debugging json
-                buffer.append(line + "\n");
-            }
 
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
-            moviesJsonString = buffer.toString();
+        } else {
+            // user wants popular movies or best rated movies from MovieDB
 
-            //Log.v(LOG_TAG, "- movies: " + moviesJsonString);
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
 
-            mdbMovieList = getMoviesFromJson(moviesJsonString);
-        } catch (IOException | JSONException e) {
-            //Log.e(LOG_TAG, "Internet Connection Error when connection to MovieDB ", e);
 
-            return null;
-        } finally{
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    //Log.e("PlaceholderFragment", "Error closing stream", e);
+
+            // Will contain the raw JSON response as a string.
+            String moviesJsonString = null;
+
+            try {
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme("http")
+                        .authority("api.themoviedb.org")
+                        .appendPath("3")
+                        .appendPath("discover")
+                        .appendPath("movie")
+                        .appendQueryParameter("sort_by", this.sortOrder)
+                        .appendQueryParameter("vote_count.gte", "100")
+                        .appendQueryParameter("api_key",
+                                this.context.getResources().getString(string.movie_db_api_key));
+
+                URL url = new URL(builder.build().toString());
+
+                //Log.v(LOG_TAG, "Built movie URI: " + builder.build().toString());
+
+                // Create the request to moviedb, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // add newlines for readability when debugging json
+                    buffer.append(line + "\n");
                 }
 
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                moviesJsonString = buffer.toString();
 
+                //Log.v(LOG_TAG, "- movies: " + moviesJsonString);
+
+                mdbMovieList = getMoviesFromJson(moviesJsonString);
+            } catch (IOException | JSONException e) {
+                //Log.e(LOG_TAG, "Internet Connection Error when connection to MovieDB ", e);
+
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        //Log.e("PlaceholderFragment", "Error closing stream", e);
+                    }
+                }
             }
         }
-
-
         return mdbMovieList;
     }
 
