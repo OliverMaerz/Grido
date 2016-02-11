@@ -4,10 +4,8 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -187,12 +185,6 @@ public class DetailFragment extends Fragment {
      * @param movie
      */
     private void saveFavoriteToDatabase(MdbMovie movie) {
-        // store the image
-        long selectedImageUri = ContentUris.parseId(Uri.parse(movie.posterUrl));
-        Bitmap bm = MediaStore.Images.Thumbnails.getThumbnail(
-                context.getContentResolver(), selectedImageUri, MediaStore.Images.Thumbnails.MICRO_KIND,
-                null );
-
         // first insert the row for the movie data (title, description etc.)
         FavoriteContentValues favValues = new FavoriteContentValues();
         favValues.putOriginaltitle(movie.originalTitle)
