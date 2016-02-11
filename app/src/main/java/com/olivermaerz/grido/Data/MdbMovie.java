@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by omaerz on 11/25/15.
  */
 public class MdbMovie implements Parcelable {
-    public int id;
+    public long id;
     public String originalTitle;
     public String posterUrl;
     public String description;
@@ -60,7 +60,7 @@ public class MdbMovie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.id);
+        dest.writeLong(this.id);
         dest.writeString(this.originalTitle);
         dest.writeString(this.posterUrl);
         dest.writeString(this.description);
