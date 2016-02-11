@@ -3,8 +3,11 @@ package com.olivermaerz.grido.ui;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,7 +25,9 @@ import com.olivermaerz.grido.adapter.TrailerAdapter;
 import com.olivermaerz.grido.data.MdbMovie;
 import com.olivermaerz.grido.data.Review;
 import com.olivermaerz.grido.data.Trailer;
+import com.olivermaerz.grido.provider.favorite.FavoriteColumns;
 import com.olivermaerz.grido.provider.favorite.FavoriteContentValues;
+import com.olivermaerz.grido.provider.favorite.FavoriteSelection;
 import com.olivermaerz.grido.provider.review.ReviewColumns;
 import com.olivermaerz.grido.provider.review.ReviewContentValues;
 import com.olivermaerz.grido.provider.trailer.TrailerColumns;
@@ -46,6 +51,7 @@ public class DetailFragment extends Fragment {
     private Context context;
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
+    private boolean isFavorite;
 
     private final String LOG_TAG = "DetailFragment";
 
@@ -79,17 +85,42 @@ public class DetailFragment extends Fragment {
             // button is invisible by default - make visible
             favoriteButton.setVisibility(View.VISIBLE);
 
+            // check if the movie is a favorite (display the heart icon as solid in that case
+            FavoriteSelection where = new FavoriteSelection();
+            where.movieId(movie.id);
+            Cursor cursor = context.getContentResolver().query(FavoriteColumns.CONTENT_URI, null,
+                    where.sel(), where.args(), null);
+
+            if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
+                isFavorite = false;
+            } else {
+                isFavorite = true;
+                favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
+            }
+            cursor.close();
+
+
             // set listener when favorites button is clicked
             favoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Snackbar.make(view, "Added to favorites", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    if (isFavorite) {
+                        Snackbar.make(view, "Removed movie from favorites", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
 
-                    saveFavoriteToDatabase(movie);
-                    // change the heart icon to solid when movie is favorite
-                    favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
+                        removeFavoriteFromDatabase(movie.id);
+                        // change the heart icon to border when movie is not a favorite
+                        favoriteButton.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                        isFavorite = false;
+                    } else {
+                        Snackbar.make(view, "Added movie to favorites", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
 
+                        saveFavoriteToDatabase(movie);
+                        // change the heart icon to solid when movie is favorite
+                        favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
+                        isFavorite = true;
+                    }
                 }
             });
 
@@ -150,7 +181,17 @@ public class DetailFragment extends Fragment {
         this.context = context;
     }
 
+    /**
+     * Save the movie to favorite table in favorites db
+     *
+     * @param movie
+     */
     private void saveFavoriteToDatabase(MdbMovie movie) {
+        // store the image
+        long selectedImageUri = ContentUris.parseId(Uri.parse(movie.posterUrl));
+        Bitmap bm = MediaStore.Images.Thumbnails.getThumbnail(
+                context.getContentResolver(), selectedImageUri, MediaStore.Images.Thumbnails.MICRO_KIND,
+                null );
 
         // first insert the row for the movie data (title, description etc.)
         FavoriteContentValues favValues = new FavoriteContentValues();
@@ -161,33 +202,44 @@ public class DetailFragment extends Fragment {
                 .putPoster(movie.posterUrl)
                 .putMovieId(movie.id);
 
-        // now get the URI and the ID for the inserted record
+        // get the URI and the ID for the inserted record
         Uri favoriteUri = favValues.insert(context.getContentResolver());
         long favoriteId = ContentUris.parseId(favoriteUri);
 
-        // now insert the rows for the reviews
+        Log.v(LOG_TAG, "saveFavoriteToDatabase favoriteUri:" + favoriteUri );
+        Log.v(LOG_TAG, "saveFavoriteToDatabase favoriteId:" + favoriteId );
+
+        // insert the rows for the reviews
         ContentValues[] revValues = new ContentValues[movie.reviews.size()];
         int i = 0;
-        for (Review review: movie.reviews) {
+        for (Review review : movie.reviews) {
             ReviewContentValues revValue = new ReviewContentValues();
             revValues[i] = revValue.putContent(review.content).putAuthor(review.author).putFavoriteId(favoriteId).values();
             i++;
         }
         context.getContentResolver().bulkInsert(ReviewColumns.CONTENT_URI, revValues);
 
-        // now insert the rows for the trailers
+        // insert the rows for the trailers
         ContentValues[] trailerValues = new ContentValues[movie.trailers.size()];
         i = 0;
-        for (Trailer trailer: movie.trailers) {
+        for (Trailer trailer : movie.trailers) {
             TrailerContentValues trailerValue = new TrailerContentValues();
             trailerValues[i] = trailerValue.putName(trailer.name).putSource(trailer.source).putFavoriteId(favoriteId).values();
             i++;
         }
         context.getContentResolver().bulkInsert(TrailerColumns.CONTENT_URI, trailerValues);
-
     }
 
+    /**
+     * Remove movie with movieId from favorite table in favorites db
+     *
+     * @param movieId
+     */
+    private void removeFavoriteFromDatabase(long movieId) {
+        FavoriteSelection where = new FavoriteSelection();
+        where.movieId(movieId);
+        context.getContentResolver().delete(FavoriteColumns.CONTENT_URI, where.sel(), where.args());
 
-
+    }
 
 }
