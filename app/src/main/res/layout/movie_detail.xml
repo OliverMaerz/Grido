@@ -12,20 +12,12 @@
         <ImageView
             android:layout_width="200dp"
             android:layout_height="300dp"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/loading_image"
             android:id="@+id/imageView"
             android:contentDescription="@string/movie_poster"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp" />
-
-        <!-- android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_favorite_border_white_24dp" /-->
 
         <ImageButton style="@style/AppTheme"
             android:layout_width="60dp"

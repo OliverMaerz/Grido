@@ -8,13 +8,11 @@ import android.os.Parcelable;
  */
 public class Trailer implements Parcelable {
     public String name;
-    public String size;
     public String source;
 
     // write strings into parcel
-    public Trailer(String name, String size, String source){
+    public Trailer(String name, String source){
         this.name = name;
-        this.size = size;
         this.source = source;
 
     }
@@ -22,7 +20,6 @@ public class Trailer implements Parcelable {
     // receive the parcel
     private Trailer(Parcel in) {
         this.name = in.readString();
-        this.size = in.readString();
         this.source = in.readString();
     }
 
@@ -34,7 +31,6 @@ public class Trailer implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
-        dest.writeString(this.size);
         dest.writeString(this.source);
     }
 

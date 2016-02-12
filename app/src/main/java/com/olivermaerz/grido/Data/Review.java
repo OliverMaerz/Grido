@@ -7,14 +7,12 @@ import android.os.Parcelable;
  * Created by omaerz on 11/25/15.
  */
 public class Review implements Parcelable {
-    public String id;
     public String author;
     public String content;
 
 
     // write strings into parcel
-    public Review(String id, String author, String content){
-        this.id = id;
+    public Review(String author, String content){
         this.author = author;
         this.content = content;
 
@@ -22,7 +20,6 @@ public class Review implements Parcelable {
 
     // receive the parcel
     private Review(Parcel in) {
-        this.id = in.readString();
         this.author = in.readString();
         this.content = in.readString();
     }
@@ -34,7 +31,6 @@ public class Review implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
         dest.writeString(this.author);
         dest.writeString(this.content);
     }

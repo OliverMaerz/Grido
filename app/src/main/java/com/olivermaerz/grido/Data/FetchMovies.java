@@ -9,6 +9,10 @@ import android.widget.Toast;
 import com.olivermaerz.grido.adapter.ImageAdapter;
 import com.olivermaerz.grido.provider.favorite.FavoriteCursor;
 import com.olivermaerz.grido.provider.favorite.FavoriteSelection;
+import com.olivermaerz.grido.provider.review.ReviewCursor;
+import com.olivermaerz.grido.provider.review.ReviewSelection;
+import com.olivermaerz.grido.provider.trailer.TrailerCursor;
+import com.olivermaerz.grido.provider.trailer.TrailerSelection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,8 +101,6 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
             FavoriteSelection favoriteSelection = new FavoriteSelection();
             FavoriteCursor favoriteCursor = favoriteSelection.query(context);
 
-            //Cursor favoriteCursor = context.getContentResolver().query(FavoriteColumns.CONTENT_URI,null,null,null,null);
-
             while (favoriteCursor.moveToNext()) {
                 MdbMovie movie = new MdbMovie();
                 movie.id = favoriteCursor.getMovieId();
@@ -107,12 +109,33 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
                 movie.posterUrl = favoriteCursor.getPoster();
                 movie.rating = Double.parseDouble(favoriteCursor.getRated());
                 movie.releaseDate = favoriteCursor.getReleasedate();
+                movie.detailsRetrieved = true; // always true for movies retrieved from db
 
+                // retrieve the reviews
                 movie.reviews = new ArrayList<>();
+                ReviewSelection reviewSelection = new ReviewSelection();
+                reviewSelection.favoriteMovieId(movie.id);
+                ReviewCursor reviewCursor = reviewSelection.query(context);
+
+                while (reviewCursor.moveToNext()) {
+                    Review review = new Review(reviewCursor.getContent(),reviewCursor.getAuthor());
+                    movie.reviews.add(review);
+                }
+                reviewCursor.close();
+
+                // retrieve the trailers
                 movie.trailers = new ArrayList<>();
+                TrailerSelection trailerSelection = new TrailerSelection();
+                trailerSelection.favoriteMovieId(movie.id);
+                TrailerCursor trailerCursor = trailerSelection.query(context);
+
+                while (trailerCursor.moveToNext()) {
+                    Trailer trailer = new Trailer(trailerCursor.getName(),trailerCursor.getSource());
+                    movie.trailers.add(trailer);
+                }
+                trailerCursor.close();
 
                 mdbMovieList.add(movie);
-
 
             }
             favoriteCursor.close();
@@ -248,11 +271,11 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
                     jsonMovie.getString(MDB_DESCRIPTION),
                     jsonMovie.getString(MDB_RELEASE_DATE),
                     jsonMovie.getDouble(MDB_RATING),
-                    true,
+                    false,
                     null,
                     null);
 
-            movie = getDetailsForMovie(jsonMovie.getString(MDB_ID), movie);
+            //movie = getDetailsForMovie(jsonMovie.getString(MDB_ID), movie);
 
             mdbMovieList.add(movie);
 
@@ -261,154 +284,6 @@ public class FetchMovies extends AsyncTask<String, String, ArrayList<MdbMovie>> 
         Log.v(LOG_TAG, "mdbMovieList: " + mdbMovieList.toString());
 
         return mdbMovieList;
-
     }
-
-    /**
-     * Call MovieDB API and get reviews for movie
-     */
-
-    private MdbMovie getDetailsForMovie(String movieId, MdbMovie movie) {
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        String movieDetailsJsonString;
-
-        try {
-            Uri.Builder builder = new Uri.Builder();
-            builder.scheme("http")
-                    .authority("api.themoviedb.org")
-                    .appendPath("3")
-                    .appendPath("movie")
-                    .appendPath(movieId)
-                    //.appendPath("reviews")
-                    .appendQueryParameter("api_key",
-                            this.context.getResources().getString(string.movie_db_api_key))
-                    .appendQueryParameter("append_to_response", "reviews,trailers");
-
-            URL url = new URL(builder.build().toString());
-
-            Log.v(LOG_TAG, "Built URI: " + builder.build().toString());
-
-            // Create the request to moviedb, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // add newlines for readability when debugging json
-                buffer.append(line + "\n");
-            }
-
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
-            movieDetailsJsonString = buffer.toString();
-
-            movie = getMovieDetailsFromJson(movieDetailsJsonString, movie);
-            Log.v(LOG_TAG, "- getDetailsForMovie: " + movieDetailsJsonString);
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Internet Connection Error when connection to MovieDB ", e);
-            return null;
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "JSONException Error when parsing movie details ", e);
-            return null;
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    //Log.e("PlaceholderFragment", "Error closing stream", e);
-                }
-            }
-        }
-        return movie;
-    }
-
-
-    /**
-     * Process String with movie details in JSON Format and pull out the data like reviews, trailers
-     */
-    private MdbMovie getMovieDetailsFromJson(String jsonStr, MdbMovie movie) throws JSONException {
-
-        Log.v(LOG_TAG, "- getMovieDetailsFromJson: " + jsonStr);
-
-        // These are the names of the JSON objects that need to be extracted.
-        final String REVIEW_TAG = "reviews";
-        final String REVIEW_LIST = "results";
-        final String REVIEW_ID = "id";
-        final String REVIEW_AUTHOR = "author";
-        final String REVIEW_CONTENT = "content";
-
-        final String TRAILER_LIST = "trailers";
-        final String TRAILER_YOUTUBE = "youtube";
-        final String TRAILER_NAME = "name";
-        final String TRAILER_SIZE = "size";
-        final String TRAILER_SOURCE = "source";
-
-        JSONObject movieDetailsJsonObject = new JSONObject(jsonStr);
-        // now get the child elements of the "reviews" element as JSONObject
-        //JSONObject reviews = movieDetailsJsonObject.getJSONObject(REVIEW_TAG);
-        JSONArray results = movieDetailsJsonObject.getJSONObject(REVIEW_TAG).getJSONArray(REVIEW_LIST);
-
-        ArrayList<Review> reviewList = new ArrayList<>();
-        for (int i = 0; i < results.length(); i++) {
-
-            // Get the JSON object
-            JSONObject jsonMovie = results.getJSONObject(i);
-
-            Log.v(LOG_TAG, "while loop review: " + jsonMovie.getString(REVIEW_ID));
-
-            reviewList.add(new Review(
-                    jsonMovie.getString(REVIEW_ID),
-                    jsonMovie.getString(REVIEW_AUTHOR),
-                    jsonMovie.getString(REVIEW_CONTENT)));
-        }
-
-
-
-        Log.v(LOG_TAG, "reviewList: " + reviewList.toString());
-
-        // now do the same for trailers (TODO: refactor into separate method that handles both)
-        JSONArray trailerJsonArray = movieDetailsJsonObject.getJSONObject(TRAILER_LIST).getJSONArray(TRAILER_YOUTUBE);
-
-        ArrayList<Trailer> trailerList = new ArrayList<>();
-        for(int i = 0; i < trailerJsonArray.length(); i++) {
-
-            // Get the JSON object
-            JSONObject jsonMovie = trailerJsonArray.getJSONObject(i);
-
-            trailerList.add(new Trailer(
-                    jsonMovie.getString(TRAILER_NAME),
-                    jsonMovie.getString(TRAILER_SIZE),
-                    jsonMovie.getString(TRAILER_SOURCE)));
-
-        }
-        Log.v(LOG_TAG, "trailerList: " + trailerList.toString());
-
-        movie.reviews = reviewList;
-        movie.trailers = trailerList;
-
-        return movie;
-
-    }
-
-
 
 }

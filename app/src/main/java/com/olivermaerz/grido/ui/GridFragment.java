@@ -21,9 +21,11 @@ import android.widget.Toast;
 import com.olivermaerz.grido.Config;
 import com.olivermaerz.grido.R;
 import com.olivermaerz.grido.adapter.ImageAdapter;
+import com.olivermaerz.grido.data.FetchMovieDetails;
 import com.olivermaerz.grido.data.FetchMovies;
 import com.olivermaerz.grido.data.MdbMovie;
 import com.olivermaerz.grido.data.OnCompleted;
+import com.olivermaerz.grido.data.OnMovieCompleted;
 import com.olivermaerz.grido.provider.favorite.FavoriteColumns;
 
 import java.util.ArrayList;
@@ -36,11 +38,8 @@ import java.util.ArrayList;
  * to handle interaction events.
  */
 
-public class GridFragment extends Fragment implements OnCompleted {
+public class GridFragment extends Fragment implements OnCompleted, OnMovieCompleted {
 
-
-    public GridFragment() {
-    }
 
     public ImageAdapter imageAdapter;
     private ArrayList<MdbMovie> movieListObj;
@@ -71,7 +70,15 @@ public class GridFragment extends Fragment implements OnCompleted {
 
     private Activity myActivity;
 
+    private int position;
 
+
+    public GridFragment() {
+    }
+
+    public GridFragment outer(){
+        return GridFragment.this;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -142,7 +149,8 @@ public class GridFragment extends Fragment implements OnCompleted {
             // no instance for movie date found - call movie db
             Log.v(LOG_TAG, "No saved instance - creating ArrayList and fetching movie data");
             movieListObj = new ArrayList<>();
-            FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, imageAdapter, this.myActivity, this );
+            FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth,
+                    imageAdapter, this.myActivity, this );
             fetchMovies.execute();
 
 
@@ -164,28 +172,41 @@ public class GridFragment extends Fragment implements OnCompleted {
         }
 
 
-        // listener if movie post is clicked to show the details page
+        // listener if movie poster is clicked to show the details view
         this.gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 
                 // get data from clicked movie poster and assign to 'movie'
-                MdbMovie movie = movieListObj.get(position);
+                MdbMovie movie = movieListObj.get(pos);
 
                 if (movie == null) {
                     return;
                 }
 
 
-                if (mListener != null) {
-                    mListener.onFragmentInteraction(movieListObj.get(position));
+                // check if movie details have been retrieved already
+
+                if (movie.detailsRetrieved == true){
+                    // moviedetails present ... show fragment for details
+                    Log.v(LOG_TAG, "movie details are already present - call detail view");
+                    if (mListener != null) {
+                        mListener.onFragmentInteraction(movieListObj.get(pos));
+                    }
+                } else {
+                    Log.v(LOG_TAG, "movie details need to be retrieved for position: " + pos);
+                    //set current position
+                    position = pos;
+
+                    // need to retrieve movie details first
+                    FetchMovieDetails fetchMovieDetails = new FetchMovieDetails(
+                            myActivity, outer(), movie);
+                    fetchMovieDetails.execute();
+
+
                 }
 
 
 
-                // create intent and pass to detail activity
-                /* TODO: Intent movieDetailIntent = new Intent(myActivity, DetailActivity.class)
-                        .putExtra(mdbMovie.EXTRA_MOVIE, mdbMovieListObj.get(position));
-                startActivity(movieDetailIntent);*/
 
             }
         });
@@ -205,13 +226,8 @@ public class GridFragment extends Fragment implements OnCompleted {
         // Inflate the layout for this fragment
         this.view  = inflater.inflate(R.layout.fragment_grid, container, false);
 
-
-
-
         // for access to toolbar
         setHasOptionsMenu(true);
-
-
 
         return this.view;
     }
@@ -229,6 +245,13 @@ public class GridFragment extends Fragment implements OnCompleted {
         //myActivity.getMenuInflater().inflate(R.menu.menu_main, menu);
         inflater.inflate(R.menu.menu_main, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
+        // check what menu option is currently selected
+        if (config.sortOrder.equals(FAVORITES)) {
+            menu.findItem(R.id.show_favorites).setChecked(true);
+        } else if (config.sortOrder.equals(RATING)) {
+            menu.findItem(R.id.sort_by_rating).setChecked(true);
+        } // most popular is the default in the menu resource - so no need to check for it here
     }
 
 
@@ -254,10 +277,9 @@ public class GridFragment extends Fragment implements OnCompleted {
                 resetGrid();
                 config.sortOrder = POPULARITY;
                 // reload the MovieDB data with the new sort order
-                FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
+                FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth,
+                        this.imageAdapter, this.myActivity, this);
                 fetchMovies.execute();
-
-
             }
         } else if (id == R.id.sort_by_rating) {
             if (!config.sortOrder.equals(RATING)) {
@@ -265,9 +287,9 @@ public class GridFragment extends Fragment implements OnCompleted {
                 resetGrid();
                 config.sortOrder = RATING;
                 // reload the MovieDB data with the new sort order
-                FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
+                FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth,
+                        this.imageAdapter, this.myActivity, this);
                 fetchMovies.execute();
-
             }
 
         } else if (id == R.id.show_favorites) {
@@ -275,8 +297,8 @@ public class GridFragment extends Fragment implements OnCompleted {
 
                 // check if there are favorites stored
 
-                Cursor cursor = getContext().getContentResolver().query(FavoriteColumns.CONTENT_URI, null,
-                        null, null, null);
+                Cursor cursor = getContext().getContentResolver().query(
+                        FavoriteColumns.CONTENT_URI, null, null, null, null);
 
                 if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
                     Toast.makeText(getActivity(), R.string.no_favorites_found,
@@ -286,7 +308,8 @@ public class GridFragment extends Fragment implements OnCompleted {
                     item.setChecked(true);
                     resetGrid();
                     config.sortOrder = FAVORITES;
-                    FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth, this.imageAdapter, this.myActivity, this);
+                    FetchMovies fetchMovies = new FetchMovies(config.sortOrder, this.imageWidth,
+                            this.imageAdapter, this.myActivity, this);
                     fetchMovies.execute();
                 }
                 cursor.close();
@@ -311,12 +334,6 @@ public class GridFragment extends Fragment implements OnCompleted {
 
     }
 
-    //public void onButtonPressed(Uri uri) {
-    //    if (mListener != null) {
-    //        mListener.onFragmentInteraction(uri);
-    //    }
-    //}
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -335,6 +352,17 @@ public class GridFragment extends Fragment implements OnCompleted {
     public void onDetach() {
         super.onDetach();
         this.mListener = null;
+    }
+
+    @Override
+    public void onMovieDetailTaskCompleted(MdbMovie movie) {
+
+
+        movieListObj.set(this.position,movie);
+        if (mListener != null) {
+            mListener.onFragmentInteraction(movie);
+        }
+
     }
 
     /**

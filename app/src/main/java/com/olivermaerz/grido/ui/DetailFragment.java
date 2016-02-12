@@ -3,14 +3,20 @@ package com.olivermaerz.grido.ui;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -41,6 +47,8 @@ import java.util.Date;
  * Package: com.olivermaerz.grido
  * Created by omaerz on 1/13/16.
  */
+
+
 public class DetailFragment extends Fragment {
 
     private View view;
@@ -50,8 +58,12 @@ public class DetailFragment extends Fragment {
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private boolean isFavorite;
-
+    private ShareActionProvider mShareActionProvider;
+    private boolean shareTrailer;
+    private String youtubeID;
     private final String LOG_TAG = "DetailFragment";
+    private MdbMovie movieObj;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,9 +73,49 @@ public class DetailFragment extends Fragment {
         this.view  = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // for access to toolbar
-        //setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
 
         return this.view;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        // Locate MenuItem with ShareActionProvider
+        MenuItem menuItem = menu.findItem(R.id.menu_item_share);
+
+        // check if there is a trailer to share
+        if (shareTrailer) {
+            menuItem.setVisible(true);
+            ShareActionProvider shareAction =
+                    (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+            shareAction.setShareIntent(createShareIntent());
+        } else {
+            menuItem.setVisible(false);
+        }
+
+
+
+    }
+
+    protected Intent createShareIntent() {
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.check_out_this_movie));
+        intent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + this.youtubeID);
+        intent.setType("text/plain");
+
+        return intent;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.menu_share_action, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
     }
 
     @Override
@@ -71,102 +123,117 @@ public class DetailFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
 
-
-
         //Intent intent = getIntent();
         Bundle extras = getArguments();
+
 
         if (extras != null) {
             final MdbMovie movie = extras.getParcelable(MdbMovie.EXTRA_MOVIE);
             final ImageButton favoriteButton = (ImageButton) this.view.findViewById(R.id.favorite);
 
-            // button is invisible by default - make visible
-            favoriteButton.setVisibility(View.VISIBLE);
 
-            // check if the movie is a favorite (display the heart icon as solid in that case
-            FavoriteSelection where = new FavoriteSelection();
-            where.movieId(movie.id);
-            Cursor cursor = context.getContentResolver().query(FavoriteColumns.CONTENT_URI, null,
-                    where.sel(), where.args(), null);
+            if (movie != null) {
+                // button is invisible by default - make visible
+                favoriteButton.setVisibility(View.VISIBLE);
 
-            if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
-                isFavorite = false;
-            } else {
-                isFavorite = true;
-                favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
-            }
-            cursor.close();
+                // check if the movie is a favorite (display the heart icon as solid in that case
+                FavoriteSelection where = new FavoriteSelection();
+                where.movieId(movie.id);
+                Cursor cursor = context.getContentResolver().query(FavoriteColumns.CONTENT_URI,
+                        null, where.sel(), where.args(), null);
 
-
-            // set listener when favorites button is clicked
-            favoriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (isFavorite) {
-                        Snackbar.make(view, "Removed movie from favorites", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-
-                        removeFavoriteFromDatabase(movie.id);
-                        // change the heart icon to border when movie is not a favorite
-                        favoriteButton.setImageResource(R.drawable.ic_favorite_border_white_24dp);
-                        isFavorite = false;
-                    } else {
-                        Snackbar.make(view, "Added movie to favorites", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-
-                        saveFavoriteToDatabase(movie);
-                        // change the heart icon to solid when movie is favorite
-                        favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
-                        isFavorite = true;
-                    }
+                if (!(cursor.moveToFirst()) || cursor.getCount() == 0) {
+                    this.isFavorite = false;
+                } else {
+                    this.isFavorite = true;
+                    favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
                 }
-            });
+                cursor.close();
 
 
-            // get the strings and double we need from the parcelable (title, rating, description)
-            ((TextView) this.view.findViewById(R.id.movieTitle)).setText(movie.originalTitle);
-            ((TextView) this.view.findViewById(R.id.rating)).setText(getString(R.string.rated) +
-                    movie.rating + getString(R.string.of_10_points));
-            ((TextView) this.view.findViewById(R.id.description)).setText(movie.description);
+                // set listener when favorites button is clicked
+                favoriteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (isFavorite) {
+                            Snackbar.make(view, "Removed movie from favorites",
+                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
-            // reformat the date so it looks a little nicer and is displayed localized
-            try {
-                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(movie.releaseDate);
-                DateFormat dateFormat =
-                        android.text.format.DateFormat.getDateFormat(this.context);
-                ((TextView) this.view.findViewById(R.id.releaseDate)).setText(getString(R.string.released) +
-                        dateFormat.format(date));
+                            removeFavoriteFromDatabase(movie.id);
+                            // change the heart icon to border when movie is not a favorite
+                            favoriteButton.setImageResource(
+                                    R.drawable.ic_favorite_border_white_24dp);
+                            isFavorite = false;
+                        } else {
+                            Snackbar.make(view, "Added movie to favorites", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
 
-            } catch (ParseException e) {
-                //e.printStackTrace();
-                // error parsing date - they must have change the format - just output string as
-                // received from MovieDB
-                ((TextView) this.view.findViewById(R.id.releaseDate)).setText(getString(R.string.released) +
-                        getString(R.string.unknown));
+                            saveFavoriteToDatabase(movie);
+                            // change the heart icon to solid when movie is favorite
+                            favoriteButton.setImageResource(R.drawable.ic_favorite_white_24dp);
+                            isFavorite = true;
+                        }
+                    }
+                });
+
+                // get the strings and double we need from the parcelable
+                // (title, rating, description)
+                ((TextView) this.view.findViewById(R.id.movieTitle)).setText(movie.originalTitle);
+                ((TextView) this.view.findViewById(R.id.rating)).setText(getString(R.string.rated) +
+                        movie.rating + getString(R.string.of_10_points));
+                ((TextView) this.view.findViewById(R.id.description)).setText(movie.description);
+
+                // reformat the date so it looks a little nicer and is displayed localized
+                try {
+                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(movie.releaseDate);
+                    DateFormat dateFormat =
+                            android.text.format.DateFormat.getDateFormat(this.context);
+                    ((TextView) this.view.findViewById(R.id.releaseDate))
+                            .setText(getString(R.string.released) +
+                            dateFormat.format(date));
+
+                } catch (ParseException e) {
+                    //e.printStackTrace();
+                    // error parsing date - they must have change the format - just output string
+                    // as received from MovieDB
+                    ((TextView) this.view.findViewById(R.id.releaseDate))
+                            .setText(getString(R.string.released) +
+                            getString(R.string.unknown));
+                }
+
+
+
+                // load the image from the poster url into the view (incl. caching, resizing etc.
+                Picasso.with(this.getActivity())
+                        .load(movie.posterUrl)
+                        .placeholder(R.drawable.loading_image)
+                        .into((ImageView) this.view.findViewById(R.id.imageView));
+
+
+                // listviews for reviews and trailers
+                this.reviewListView = (NonScrollListView)
+                        this.view.findViewById(R.id.reviews_listview);
+                this.trailerListView = (NonScrollListView)
+                        this.view.findViewById(R.id.trailers_listview);
+
+                Log.v(LOG_TAG, " movie.reviews: " + movie.reviews);
+
+                // instantiate adapters for reviews and trailers
+                this.reviewAdapter = new ReviewAdapter(this.getActivity(), movie.reviews);
+                this.trailerAdapter = new TrailerAdapter(this.getActivity(), movie.trailers);
+
+                // if movie has trailers allow sharing the first video
+                if (movie.trailers.size() > 0) {
+                    this.youtubeID = movie.trailers.get(0).source;
+                    this.shareTrailer = true;
+
+                }
+
+
+                // Assign adapters to ListView
+                reviewListView.setAdapter(this.reviewAdapter);
+                trailerListView.setAdapter(this.trailerAdapter);
             }
-
-
-
-            // load the image from the poster url into the view (incl. caching, resizing etc.
-            Picasso.with(this.getActivity())
-                    .load(movie.posterUrl)
-                    .placeholder(R.drawable.loading_image)
-                    .into((ImageView) this.view.findViewById(R.id.imageView));
-
-            // listviews for reviews and trailers
-            this.reviewListView = (NonScrollListView) this.view.findViewById(R.id.reviews_listview);
-            this.trailerListView = (NonScrollListView)
-                    this.view.findViewById(R.id.trailers_listview);
-
-            Log.v(LOG_TAG, " movie.reviews: " + movie.reviews);
-
-            // instantiate adapters for reviews and trailers
-            this.reviewAdapter = new ReviewAdapter(this.getActivity(), movie.reviews);
-            this.trailerAdapter = new TrailerAdapter(this.getActivity(), movie.trailers);
-
-            // Assign adapters to ListView
-            reviewListView.setAdapter(this.reviewAdapter);
-            trailerListView.setAdapter(this.trailerAdapter);
 
         }
 
@@ -206,7 +273,8 @@ public class DetailFragment extends Fragment {
         int i = 0;
         for (Review review : movie.reviews) {
             ReviewContentValues revValue = new ReviewContentValues();
-            revValues[i] = revValue.putContent(review.content).putAuthor(review.author).putFavoriteId(favoriteId).values();
+            revValues[i] = revValue.putContent(review.content).putAuthor(review.author)
+                    .putFavoriteId(favoriteId).values();
             i++;
         }
         context.getContentResolver().bulkInsert(ReviewColumns.CONTENT_URI, revValues);
@@ -216,7 +284,8 @@ public class DetailFragment extends Fragment {
         i = 0;
         for (Trailer trailer : movie.trailers) {
             TrailerContentValues trailerValue = new TrailerContentValues();
-            trailerValues[i] = trailerValue.putName(trailer.name).putSource(trailer.source).putFavoriteId(favoriteId).values();
+            trailerValues[i] = trailerValue.putName(trailer.name).putSource(trailer.source)
+                    .putFavoriteId(favoriteId).values();
             i++;
         }
         context.getContentResolver().bulkInsert(TrailerColumns.CONTENT_URI, trailerValues);
